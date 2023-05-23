@@ -1,5 +1,6 @@
 package io.github.pleuvoir.web3.utils;
 
+import io.github.pleuvoir.web3.config.AppConfig;
 import java.math.RoundingMode;
 import jnr.a64asm.PREF_ENUM;
 import lombok.Data;
@@ -32,12 +33,21 @@ public class AccountHelper {
 
     static Web3j web3j;
 
-    static {
-        web3j = Web3j.build(new HttpService("https://mainnet.infura.io/v3/?"));
+
+    public static Web3j getWeb3j() {
+        if (web3j != null) {
+            return web3j;
+        }
+        String apiKey = AppConfig.getInstance().getInfuraApiKey();
+        log.info("init apiKey={}", apiKey);
+        web3j = Web3j.build(new HttpService("https://mainnet.infura.io/v3/" + apiKey));
+        return web3j;
     }
+
 
     @Data
     static class AccountDTO {
+
         private String privateKey;
         private String publicKey;
         private String address;
@@ -96,11 +106,11 @@ public class AccountHelper {
 
     public static BigDecimal getBalance(String address) {
         try {
-            log.info("获取以太坊账户余额 {}",address);
-            EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
+            log.info("获取以太坊账户余额 {}", address);
+            EthGetBalance balance = getWeb3j().ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
             return new BigDecimal(balance.getBalance());
         } catch (IOException e) {
-            log.error("",e);
+            log.error("", e);
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -111,13 +121,12 @@ public class AccountHelper {
      */
     public static BigDecimal getGasPrice() {
         try {
-            BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();
-           return Convert.fromWei(String.valueOf(gasPrice), Unit.GWEI).setScale(0, RoundingMode.HALF_UP);
+            BigInteger gasPrice = getWeb3j().ethGasPrice().send().getGasPrice();
+            return Convert.fromWei(String.valueOf(gasPrice), Unit.GWEI).setScale(0, RoundingMode.HALF_UP);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
 
 
     public static void main(String[] args) throws IOException {

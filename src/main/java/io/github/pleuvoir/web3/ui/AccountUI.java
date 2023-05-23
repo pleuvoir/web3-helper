@@ -1,23 +1,22 @@
-package io.github.pleuvoir.web3;
+package io.github.pleuvoir.web3.ui;
 
 import io.github.pleuvoir.web3.utils.AccountHelper;
 import java.io.File;
 import java.math.BigDecimal;
-import javafx.application.Application;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -27,17 +26,23 @@ import javafx.util.Duration;
 import org.web3j.crypto.Credentials;
 import org.web3j.utils.Convert;
 
-public class Main2 extends Application {
+/**
+ * @author <a href="mailto:pleuvior@foxmail.com">pleuvoir</a>
+ */
+public class AccountUI {
 
-    private Thread currentThread; // 当前任务所在的线程
+    private static Thread currentThread; // 当前任务所在的线程
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+
+    public static Pane create(Stage primaryStage) {
 
         // 创建一个垂直布局
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setSpacing(10);
+
+        Tab tab = new Tab("My Tab");
+        tab.setContent(root);
 
         // 创建一个水平布局用于放置按钮
         GridPane buttonBox = new GridPane();
@@ -45,7 +50,7 @@ public class Main2 extends Application {
         buttonBox.setVgap(10);
 
         Label gasFeeLabel = new Label("GAS Fee: 0.0");
-        buttonBox.add(gasFeeLabel,0,0);
+        buttonBox.add(gasFeeLabel, 0, 0);
 
         Button generateKeyButton = new Button("生成账户");
         generateKeyButton.getStyleClass().add("button-raised");
@@ -63,8 +68,6 @@ public class Main2 extends Application {
         stopButton.getStyleClass().add("button-raised");
         stopButton.setDisable(true); // 刚开始停止按钮不可点击
         buttonBox.add(stopButton, 4, 0);
-
-
 
         // 设置日志区域
         TextArea logArea = new TextArea();
@@ -314,18 +317,10 @@ public class Main2 extends Application {
             gasFeeLabel.setText("查询GAS费用失败\n");
         });
 
-// 启动服务
+        // 启动服务
         gasPriceService.start();
 
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("以太坊学习笔记");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.jpeg")));
+        return root;
 
-        primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
